@@ -19,8 +19,12 @@ var ctx = canvas.getContext("2d");
 var x = 525;
 var y = 360;
 
-var rectX = canvas.width/3;
-var rectY = -30;
+var rectangle = [];
+
+rectangle.size = getRandomInt(canvas.width/100, canvas.width/5);
+
+rectangle.x = canvas.width/3;
+rectangle.y = -30;
 
 var rect = [];
 
@@ -31,8 +35,25 @@ var leftPressed = false;
 
 var r = 30;
 
-function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
+var enemies = 1;
+
+function createRectangle(n) {
+    rectangle[n] = {
+        size: getRandomInt(canvas.width/100, canvas.width/6),
+        x: 0,
+        y: 0,
+    }
+    rectangle[n].x = getRandomInt(0, canvas.width-rectangle[c].size);
+    rectangle[n].y = -getRandomInt(-30, canvas.height+enemies*5)
+}
+
+for (c=0; c<100; c++) {
+    createRectangle(c);
+}
+
+function getRandomInt(min, max) {
+    //return Math.floor(Math.random() * max);
+    return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
 
@@ -47,22 +68,24 @@ function drawBall() {
 
 
 function drawRect() {
-    //while (var c = 0;  )
-    ctx.beginPath();
-    ctx.rect(rectX, rectY, canvas.width/3, 30);
-    ctx.fillStyle = "#bb1c2a";
-    ctx.fill();
-    ctx.closePath();
+    for (c=0; c<enemies; c++) {
+        ctx.beginPath();
+        ctx.rect(rectangle[c].x, rectangle[c].y, rectangle[c].size, 30);
+        ctx.fillStyle = "#bb1c2a";
+        ctx.fill();
+        ctx.closePath();
+    }
 }
 
 
 function collisionDetection() {
-    if (y < rectY + 30 + r && y > rectY - r &&
-        x < rectX + canvas.width/3 + r && x > rectX - r) {
-        //alert("GAME OVER!");
-        location.reload();
+    for (c=0; c<enemies; c++) {
+        if (y < rectangle[c].y + 30 + r && y > rectangle[c].y - r &&
+            x < rectangle[c].x + rectangle[c].size + r && x > rectangle[c].x - r) {
+            //alert("GAME OVER!");
+            location.reload();
+        }
     }
-
 }
 
 
@@ -100,10 +123,12 @@ function drawGame() {
         }
     }
 
-    rectY += 5;
-    if (rectY > canvas.height) {
-        rectY = -30;
-        rectX = canvas.width * getRandomInt(3) / 3;
+    for (c=0; c<enemies; c++) {
+        rectangle[c].y += 5;
+        if (rectangle[c].y > canvas.height) {
+            createRectangle(c);
+            enemies+=0.2;
+        }
     }
     requestAnimationFrame(drawGame);
 }
